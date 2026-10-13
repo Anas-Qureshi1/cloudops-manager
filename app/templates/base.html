@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}CloudOps Manager{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <div class="layout">
+
+        <aside class="sidebar">
+
+            <div class="logo">
+                <h2>CloudOps</h2>
+                <span>Manager</span>
+            </div>
+
+            <nav>
+
+                <a href="{{ url_for('dashboard') }}">
+                    Dashboard
+                </a>
+
+                <a href="{{ url_for('servers') }}">
+                    Servers
+                </a>
+
+                <a href="{{ url_for('deployments') }}">
+                    Deployments
+                </a>
+
+                <a href="{{ url_for('security') }}">
+                    Security
+                </a>
+
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>DevSecOps Platform</p>
+                <small>Admin</small>
+            </div>
+
+        </aside>
+
+
+        <main class="main-content">
+
+            <header class="topbar">
+
+                <div>
+                    <h1>{% block page_title %}{% endblock %}</h1>
+                    <p class="subtitle">
+                        Cloud infrastructure management dashboard
+                    </p>
+                </div>
+
+                <div class="user">
+                    <span>Admin</span>
+                </div>
+
+            </header>
+
+
+            <section class="content">
+
+                {% block content %}
+                {% endblock %}
+
+            </section>
+
+        </main>
+
+    </div>
+
+</body>
+
+</html>

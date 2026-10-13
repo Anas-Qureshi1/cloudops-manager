@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard | CloudOps Manager
+{% endblock %}
+
+{% block page_title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="welcome">
+
+    <h2>Cloud Infrastructure Overview</h2>
+
+    <p>
+        Monitor your cloud resources, deployments and security status.
+    </p>
+
+</div>
+
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+
+        <p>Total Servers</p>
+
+        <h2>{{ total_servers }}</h2>
+
+        <span>Cloud resources</span>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <p>Running Servers</p>
+
+        <h2>{{ running_servers }}</h2>
+
+        <span>Currently active</span>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <p>Deployments</p>
+
+        <h2>{{ total_deployments }}</h2>
+
+        <span>Total deployments</span>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <p>Security</p>
+
+        <h2>PASS</h2>
+
+        <span>Security checks active</span>
+
+    </div>
+
+</div>
+
+
+<div class="section-grid">
+
+
+    <div class="panel">
+
+        <div class="panel-header">
+
+            <h3>Recent Deployments</h3>
+
+            <a href="/deployments">
+                View All
+            </a>
+
+        </div>
+
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Version</th>
+
+                    <th>Environment</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for deployment in recent_deployments %}
+
+                <tr>
+
+                    <td>
+                        {{ deployment["version"] }}
+                    </td>
+
+                    <td>
+                        {{ deployment["environment"] }}
+                    </td>
+
+                    <td>
+
+                        {% if deployment["status"] == "SUCCESS" %}
+
+                        <span class="status success">
+                            SUCCESS
+                        </span>
+
+                        {% else %}
+
+                        <span class="status failed">
+                            FAILED
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <div class="panel">
+
+        <div class="panel-header">
+
+            <h3>Security Status</h3>
+
+            <a href="/security">
+                Details
+            </a>
+
+        </div>
+
+
+        {% for check in security_checks %}
+
+        <div class="security-check">
+
+            <span>
+                {{ check["tool"] }}
+            </span>
+
+            <strong class="text-success">
+                {{ check["status"] }}
+            </strong>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

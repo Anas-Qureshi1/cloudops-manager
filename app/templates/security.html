@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}
+Security | CloudOps Manager
+{% endblock %}
+
+{% block page_title %}
+Security
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+
+        <h3>DevSecOps Security Checks</h3>
+
+        <span>
+            {{ security_checks|length }} checks
+        </span>
+
+    </div>
+
+
+    {% for check in security_checks %}
+
+    <div class="security-check">
+
+        <div>
+
+            <strong>
+                {{ check["tool"] }}
+            </strong>
+
+            <p>
+                {{ check["description"] }}
+            </p>
+
+        </div>
+
+
+        {% if check["status"] == "PASS" %}
+
+        <strong class="text-success">
+            PASS
+        </strong>
+
+        {% else %}
+
+        <strong class="failed">
+            FAIL
+        </strong>
+
+        {% endif %}
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

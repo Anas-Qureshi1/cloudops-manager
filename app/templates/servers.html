@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}
+Servers | CloudOps Manager
+{% endblock %}
+
+{% block page_title %}
+Servers
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+
+        <h3>Cloud Servers</h3>
+
+        <span>
+            {{ servers|length }} servers
+        </span>
+
+    </div>
+
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Server</th>
+
+                <th>Status</th>
+
+                <th>CPU</th>
+
+                <th>Region</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for server in servers %}
+
+            <tr>
+
+                <td>
+                    {{ server["name"] }}
+                </td>
+
+                <td>
+
+                    {% if server["status"] == "Running" %}
+
+                    <span class="text-success">
+                        Running
+                    </span>
+
+                    {% else %}
+
+                    <span class="failed">
+                        Stopped
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+                    {{ server["cpu"] }}%
+                </td>
+
+                <td>
+                    {{ server["region"] }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}
