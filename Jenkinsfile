@@ -20,7 +20,9 @@ pipeline {
 
         stage('Gitleaks Secret Scan') {
             steps {
-                bat 'gitleaks git . --redact --exit-code 1'
+                bat '''
+                    "C:\\Tools\\gitleaks\\gitleaks.exe" git . --redact --exit-code 1
+                '''
             }
         }
 
@@ -38,6 +40,7 @@ pipeline {
             steps {
                 bat 'python -m pytest -v --junitxml=test-results.xml'
             }
+
             post {
                 always {
                     junit allowEmptyResults: true,
@@ -88,9 +91,11 @@ pipeline {
         success {
             echo 'CloudOps Manager CI pipeline completed successfully!'
         }
+
         failure {
             echo 'Pipeline failed. Review the stage logs.'
         }
+
         always {
             echo 'CloudOps Manager CI pipeline finished.'
         }
