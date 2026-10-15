@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -11,10 +12,15 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Gitleaks Secret Scan') {
+            steps {
+                bat 'gitleaks git . --redact --exit-code 1'
             }
         }
 
@@ -22,7 +28,6 @@ pipeline {
             steps {
                 bat '''
                     python --version
-                    python -m pip install --upgrade pip
                     python -m pip install -r requirements.txt
                     python -m pip install pytest
                 '''
@@ -33,11 +38,35 @@ pipeline {
             steps {
                 bat 'python -m pytest -v --junitxml=test-results.xml'
             }
-
             post {
                 always {
                     junit allowEmptyResults: true,
                           testResults: 'test-results.xml'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    bat '''
+                        "C:\\Tools\\sonar-scanner\\bin\\sonar-scanner.bat" ^
+                        -Dsonar.token=%SONAR_AUTH_TOKEN%
+                    '''
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    script {
+                        def qualityGate = waitForQualityGate()
+
+                        if (qualityGate.status != 'OK') {
+                            error "SonarQube Quality Gate failed: ${qualityGate.status}"
+                        }
+                    }
                 }
             }
         }
@@ -59,11 +88,9 @@ pipeline {
         success {
             echo 'CloudOps Manager CI pipeline completed successfully!'
         }
-
         failure {
-            echo 'Pipeline failed. Review the stage logs to identify the problem.'
+            echo 'Pipeline failed. Review the stage logs.'
         }
-
         always {
             echo 'CloudOps Manager CI pipeline finished.'
         }
