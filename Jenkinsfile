@@ -1,4 +1,4 @@
-
+```groovy
 pipeline {
     agent any
 
@@ -12,6 +12,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -53,7 +54,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     bat '''
-                        "C:\\Tools\\sonar-scanner\\bin\\sonar-scanner.bat" ^
+                        "C:\\sonar-scanner-8.1.0.6389-windows-x64\\bin\\sonar-scanner.bat" ^
                         -Dsonar.token=%SONAR_AUTH_TOKEN%
                     '''
                 }
@@ -101,3 +102,4 @@ pipeline {
         }
     }
 }
+```
