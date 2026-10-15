@@ -21,7 +21,7 @@ pipeline {
         stage('Gitleaks Secret Scan') {
             steps {
                 bat '''
-                    "C:\\Tools\\gitleaks\\gitleaks.exe" git . --redact --exit-code 1
+                    "C:\\Users\\Anas\\AppData\\Local\\Microsoft\\WinGet\\Links\\gitleaks.exe" git . --redact --exit-code 1
                 '''
             }
         }
