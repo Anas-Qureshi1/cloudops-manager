@@ -13,8 +13,14 @@ Deployments
 <div class="panel">
 
     <div class="panel-header">
-        <h3>Deployment History</h3>
+        <div>
+            <h3>Deployment History</h3>
+            <span class="badge badge-demo">Simulated Releases</span>
+        </div>
+        <span>{{ deployments|length }} records</span>
     </div>
+
+    {% if deployments %}
 
     <table>
 
@@ -28,28 +34,35 @@ Deployments
 
         <tbody>
 
-            <tr>
-                <td>v1.0.4</td>
-                <td>Production</td>
-                <td class="text-success">SUCCESS</td>
-            </tr>
+            {% for deployment in deployments %}
 
             <tr>
-                <td>v1.0.3</td>
-                <td>Production</td>
-                <td class="text-success">SUCCESS</td>
+                <td><strong>{{ deployment["version"] }}</strong></td>
+                <td>{{ deployment["environment"] }}</td>
+                <td>
+                    {% if deployment["status"] == "SUCCESS" %}
+                    <span class="status success">SUCCESS</span>
+                    {% else %}
+                    <span class="status failed">{{ deployment["status"] }}</span>
+                    {% endif %}
+                </td>
             </tr>
 
-            <tr>
-                <td>v1.0.2</td>
-                <td>Production</td>
-                <td class="failed">FAILED</td>
-            </tr>
+            {% endfor %}
 
         </tbody>
 
     </table>
 
+    {% else %}
+
+    <div class="empty-state">
+        <p>No deployment records found in the database.</p>
+        <small>Run <code>python -m app.seed</code> to populate demo deployment history.</small>
+    </div>
+
+    {% endif %}
+
 </div>
 
-{% endblock %}
+{% endblock %}

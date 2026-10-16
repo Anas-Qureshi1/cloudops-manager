@@ -14,14 +14,18 @@ Servers
 
     <div class="panel-header">
 
-        <h3>Cloud Servers</h3>
+        <div>
+            <h3>Cloud Server Inventory</h3>
+            <span class="badge badge-demo">Simulated Instances</span>
+        </div>
 
         <span>
-            {{ servers|length }} servers
+            {{ servers|length }} total servers
         </span>
 
     </div>
 
+    {% if servers %}
 
     <table>
 
@@ -49,20 +53,20 @@ Servers
             <tr>
 
                 <td>
-                    {{ server["name"] }}
+                    <strong>{{ server["name"] }}</strong>
                 </td>
 
                 <td>
 
                     {% if server["status"] == "Running" %}
 
-                    <span class="text-success">
+                    <span class="status success">
                         Running
                     </span>
 
                     {% else %}
 
-                    <span class="failed">
+                    <span class="status failed">
                         Stopped
                     </span>
 
@@ -75,7 +79,7 @@ Servers
                 </td>
 
                 <td>
-                    {{ server["region"] }}
+                    <code>{{ server["region"] }}</code>
                 </td>
 
             </tr>
@@ -86,6 +90,15 @@ Servers
 
     </table>
 
+    {% else %}
+
+    <div class="empty-state">
+        <p>No servers found in the database.</p>
+        <small>Run <code>python -m app.seed</code> to populate demo server data.</small>
+    </div>
+
+    {% endif %}
+
 </div>
 
-{% endblock %}
+{% endblock %}

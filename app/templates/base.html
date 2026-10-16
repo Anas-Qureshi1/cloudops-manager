@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CloudOps Manager - DevSecOps Cloud Resource & Security Dashboard Demo">
 
     <title>{% block title %}CloudOps Manager{% endblock %}</title>
 
@@ -14,28 +15,28 @@
 
     <div class="layout">
 
-        <aside class="sidebar">
+        <aside class="sidebar" aria-label="Sidebar Navigation">
 
             <div class="logo">
                 <h2>CloudOps</h2>
                 <span>Manager</span>
             </div>
 
-            <nav>
+            <nav aria-label="Main Navigation">
 
-                <a href="{{ url_for('dashboard') }}">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">
                     Dashboard
                 </a>
 
-                <a href="{{ url_for('servers') }}">
+                <a href="{{ url_for('servers') }}" class="nav-link">
                     Servers
                 </a>
 
-                <a href="{{ url_for('deployments') }}">
+                <a href="{{ url_for('deployments') }}" class="nav-link">
                     Deployments
                 </a>
 
-                <a href="{{ url_for('security') }}">
+                <a href="{{ url_for('security') }}" class="nav-link">
                     Security
                 </a>
 
@@ -43,7 +44,7 @@
 
             <div class="sidebar-footer">
                 <p>DevSecOps Platform</p>
-                <small>Admin</small>
+                <small>Demo Environment</small>
             </div>
 
         </aside>
@@ -56,16 +57,22 @@
                 <div>
                     <h1>{% block page_title %}{% endblock %}</h1>
                     <p class="subtitle">
-                        Cloud infrastructure management dashboard
+                        Cloud infrastructure management &amp; DevSecOps dashboard
                     </p>
                 </div>
 
-                <div class="user">
-                    <span>Admin</span>
+                <div class="user-badge-container">
+                    <span class="badge badge-demo">Simulated Demo Data</span>
+                    <div class="user">
+                        <span>Admin</span>
+                    </div>
                 </div>
 
             </header>
 
+            <div class="demo-banner" role="status">
+                <strong>Demo Mode:</strong> Displaying simulated cloud resources and pipeline verification records from local SQLite storage. Real infrastructure API integration and cloud deployment steps are documented as future roadmap items.
+            </div>
 
             <section class="content">
 
@@ -80,4 +87,4 @@
 
 </body>
 
-</html>
+</html>

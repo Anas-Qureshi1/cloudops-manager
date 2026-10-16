@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template
 from app.database import get_db_connection
 
@@ -11,92 +12,111 @@ def get_database():
     return get_db_connection()
 
 
-@app.route("/")
+@app.after_request
+def apply_security_headers(response):
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    return response
+
+
+@app.errorhandler(404)
+def handle_not_found(error):
+    return render_template("404.html"), 404
+
+
+@app.errorhandler(500)
+def handle_internal_error(error):
+    return render_template("500.html"), 500
+
+
+@app.route("/", methods=["GET"])
 def dashboard():
-
     connection = get_database()
+    try:
+        total_servers = connection.execute(
+            "SELECT COUNT(*) FROM servers"
+        ).fetchone()[0]
 
-    total_servers = connection.execute(
-        "SELECT COUNT(*) FROM servers"
-    ).fetchone()[0]
+        running_servers = connection.execute(
+            "SELECT COUNT(*) FROM servers WHERE status = 'Running'"
+        ).fetchone()[0]
 
-    running_servers = connection.execute(
-        "SELECT COUNT(*) FROM servers WHERE status = 'Running'"
-    ).fetchone()[0]
+        stopped_servers = connection.execute(
+            "SELECT COUNT(*) FROM servers WHERE status != 'Running'"
+        ).fetchone()[0]
 
-    total_deployments = connection.execute(
-        "SELECT COUNT(*) FROM deployments"
-    ).fetchone()[0]
+        total_deployments = connection.execute(
+            "SELECT COUNT(*) FROM deployments"
+        ).fetchone()[0]
 
-    security_checks = connection.execute(
-        "SELECT * FROM security_checks"
-    ).fetchall()
+        security_checks = connection.execute(
+            "SELECT * FROM security_checks"
+        ).fetchall()
 
-    recent_deployments = connection.execute(
-        """
-        SELECT *
-        FROM deployments
-        ORDER BY id DESC
-        LIMIT 5
-        """
-    ).fetchall()
-
-    connection.close()
+        recent_deployments = connection.execute(
+            """
+            SELECT *
+            FROM deployments
+            ORDER BY id DESC
+            LIMIT 5
+            """
+        ).fetchall()
+    finally:
+        connection.close()
 
     return render_template(
         "dashboard.html",
         total_servers=total_servers,
         running_servers=running_servers,
+        stopped_servers=stopped_servers,
         total_deployments=total_deployments,
         security_checks=security_checks,
         recent_deployments=recent_deployments
     )
 
 
-@app.route("/servers")
+@app.route("/servers", methods=["GET"])
 def servers():
-
     connection = get_database()
-
-    servers = connection.execute(
-        "SELECT * FROM servers ORDER BY id DESC"
-    ).fetchall()
-
-    connection.close()
+    try:
+        servers_list = connection.execute(
+            "SELECT * FROM servers ORDER BY id DESC"
+        ).fetchall()
+    finally:
+        connection.close()
 
     return render_template(
         "servers.html",
-        servers=servers
+        servers=servers_list
     )
 
 
-@app.route("/deployments")
+@app.route("/deployments", methods=["GET"])
 def deployments():
-
     connection = get_database()
-
-    deployments = connection.execute(
-        "SELECT * FROM deployments ORDER BY id DESC"
-    ).fetchall()
-
-    connection.close()
+    try:
+        deployments_list = connection.execute(
+            "SELECT * FROM deployments ORDER BY id DESC"
+        ).fetchall()
+    finally:
+        connection.close()
 
     return render_template(
         "deployments.html",
-        deployments=deployments
+        deployments=deployments_list
     )
 
 
-@app.route("/security")
+@app.route("/security", methods=["GET"])
 def security():
-
     connection = get_database()
-
-    security_checks = connection.execute(
-        "SELECT * FROM security_checks"
-    ).fetchall()
-
-    connection.close()
+    try:
+        security_checks = connection.execute(
+            "SELECT * FROM security_checks"
+        ).fetchall()
+    finally:
+        connection.close()
 
     return render_template(
         "security.html",
@@ -105,4 +125,5 @@ def security():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    debug_mode = os.environ.get("FLASK_DEBUG", "0") in ("1", "true", "True")
+    app.run(host="127.0.0.1", port=5000, debug=debug_mode)

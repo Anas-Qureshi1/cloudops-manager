@@ -20,9 +20,17 @@ __pycache__/
 *.sqlite
 *.sqlite3
 
-# Test and coverage artifacts
+# Test, report, and coverage artifacts
 .coverage
 htmlcov/
+test-results.xml
+*.xml
+*.json
+*.log
+
+# CI/CD and configuration
+Jenkinsfile
+sonar-project.properties
 
 # IDE files
 .vscode/
@@ -30,4 +38,4 @@ htmlcov/
 
 # Operating system files
 .DS_Store
-Thumbs.db
+Thumbs.db

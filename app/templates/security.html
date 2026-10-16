@@ -14,14 +14,24 @@ Security
 
     <div class="panel-header">
 
-        <h3>DevSecOps Security Checks</h3>
+        <div>
+            <h3>DevSecOps Security Checks</h3>
+            <span class="badge badge-demo">Simulated Stage Checklist</span>
+        </div>
 
         <span>
-            {{ security_checks|length }} checks
+            {{ security_checks|length }} checks configured
         </span>
 
     </div>
 
+    <div class="info-box">
+        <p>
+            <strong>Pipeline Security Architecture:</strong> These records represent standard DevSecOps verification gates configured in the CI/CD pipeline. Actual scan execution and gating occurs during Jenkins pipeline stages (Gitleaks for secrets, pytest for tests, SonarQube for SAST, pip-audit for dependencies, and Trivy for container image scanning).
+        </p>
+    </div>
+
+    {% if security_checks %}
 
     {% for check in security_checks %}
 
@@ -42,15 +52,15 @@ Security
 
         {% if check["status"] == "PASS" %}
 
-        <strong class="text-success">
+        <span class="status success">
             PASS
-        </strong>
+        </span>
 
         {% else %}
 
-        <strong class="failed">
-            FAIL
-        </strong>
+        <span class="status failed">
+            {{ check["status"] }}
+        </span>
 
         {% endif %}
 
@@ -58,6 +68,15 @@ Security
 
     {% endfor %}
 
+    {% else %}
+
+    <div class="empty-state">
+        <p>No security check records found in database.</p>
+        <small>Run <code>python -m app.seed</code> to populate demo pipeline security checks.</small>
+    </div>
+
+    {% endif %}
+
 </div>
 
-{% endblock %}
+{% endblock %}

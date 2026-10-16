@@ -73,3 +73,54 @@ def test_server_data(client):
     assert b"test-server" in response.data
     assert b"Running" in response.data
     assert b"ap-south-1" in response.data
+
+
+def test_deployments_show_data_from_configured_database(client):
+    response = client.get("/deployments")
+
+    assert response.status_code == 200
+    assert b"v-test" in response.data
+    assert b"Testing" in response.data
+    assert b"SUCCESS" in response.data
+
+
+def test_security_show_data_from_configured_database(client):
+    response = client.get("/security")
+
+    assert response.status_code == 200
+    assert b"pytest" in response.data
+    assert b"Unit testing" in response.data
+    assert b"PASS" in response.data
+
+
+def test_empty_database_rendering(monkeypatch):
+    database_fd, database_path = tempfile.mkstemp()
+    os.close(database_fd)
+
+    monkeypatch.setitem(app.config, "TESTING", True)
+    monkeypatch.setitem(app.config, "DATABASE", database_path)
+    init_db(database_path)
+
+    try:
+        empty_client = app.test_client()
+        for path in ["/", "/servers", "/deployments", "/security"]:
+            response = empty_client.get(path)
+            assert response.status_code == 200
+            assert b"empty-state" in response.data or b"No " in response.data
+    finally:
+        os.unlink(database_path)
+
+
+def test_404_error_page(client):
+    response = client.get("/nonexistent-page")
+
+    assert response.status_code == 404
+    assert b"404 Not Found" in response.data or b"could not be found" in response.data
+
+
+def test_security_headers_present(client):
+    response = client.get("/")
+
+    assert response.headers.get("X-Content-Type-Options") == "nosniff"
+    assert response.headers.get("X-Frame-Options") == "SAMEORIGIN"
+

@@ -12,10 +12,13 @@ Dashboard
 
 <div class="welcome">
 
-    <h2>Cloud Infrastructure Overview</h2>
+    <div class="welcome-header">
+        <h2>Cloud Infrastructure Overview</h2>
+        <span class="badge badge-demo">Demo Inventory</span>
+    </div>
 
     <p>
-        Monitor your cloud resources, deployments and security status.
+        Overview of cloud servers, recent deployment history, and pipeline security verification.
     </p>
 
 </div>
@@ -47,6 +50,17 @@ Dashboard
 
     <div class="stat-card">
 
+        <p>Stopped Servers</p>
+
+        <h2>{{ stopped_servers }}</h2>
+
+        <span>Offline / idle</span>
+
+    </div>
+
+
+    <div class="stat-card">
+
         <p>Deployments</p>
 
         <h2>{{ total_deployments }}</h2>
@@ -62,7 +76,7 @@ Dashboard
 
         <h2>PASS</h2>
 
-        <span>Security checks active</span>
+        <span>Pipeline checks active</span>
 
     </div>
 
@@ -78,12 +92,13 @@ Dashboard
 
             <h3>Recent Deployments</h3>
 
-            <a href="/deployments">
+            <a href="{{ url_for('deployments') }}">
                 View All
             </a>
 
         </div>
 
+        {% if recent_deployments %}
 
         <table>
 
@@ -127,7 +142,7 @@ Dashboard
                         {% else %}
 
                         <span class="status failed">
-                            FAILED
+                            {{ deployment["status"] }}
                         </span>
 
                         {% endif %}
@@ -142,6 +157,14 @@ Dashboard
 
         </table>
 
+        {% else %}
+
+        <div class="empty-state">
+            <p>No recent deployments recorded in database.</p>
+        </div>
+
+        {% endif %}
+
     </div>
 
 
@@ -151,31 +174,51 @@ Dashboard
 
             <h3>Security Status</h3>
 
-            <a href="/security">
+            <a href="{{ url_for('security') }}">
                 Details
             </a>
 
         </div>
 
+        {% if security_checks %}
 
         {% for check in security_checks %}
 
         <div class="security-check">
 
-            <span>
-                {{ check["tool"] }}
-            </span>
+            <div>
+                <strong>
+                    {{ check["tool"] }}
+                </strong>
+                <p>
+                    {{ check["description"] }}
+                </p>
+            </div>
 
+            {% if check["status"] == "PASS" %}
             <strong class="text-success">
+                PASS
+            </strong>
+            {% else %}
+            <strong class="failed">
                 {{ check["status"] }}
             </strong>
+            {% endif %}
 
         </div>
 
         {% endfor %}
 
+        {% else %}
+
+        <div class="empty-state">
+            <p>No security check records found in database.</p>
+        </div>
+
+        {% endif %}
+
     </div>
 
 </div>
 
-{% endblock %}
+{% endblock %}
