@@ -19,32 +19,32 @@ The project implements a "Shift-Left" security model where code is automatically
 ```mermaid
 flowchart TD
     subgraph SCM["1. Source Control"]
-        A[Git Commit &amp; Push] --> B[Jenkins SCM Trigger]
+        A["Git Commit & Push"] --> B["Jenkins SCM Trigger"]
     end
 
-    subgraph ShiftLeft["2. Shift-Left Security &amp; Testing"]
-        B --> C[Stage 1: Checkout]
-        C --> D[Stage 2: Gitleaks Secret Scan]
-        D --> E[Stage 3: Install Dependencies]
-        E --> F[Stage 4: Python Unit Tests (pytest)]
-        F --> G[Generate JUnit XML Report]
+    subgraph ShiftLeft["2. Shift-Left Security & Testing"]
+        B --> C["Stage 1: Checkout"]
+        C --> D["Stage 2: Gitleaks Secret Scan"]
+        D --> E["Stage 3: Install Dependencies"]
+        E --> F["Stage 4: Python Unit Tests (pytest)"]
+        F --> G["Generate JUnit XML & Coverage Reports"]
     end
 
-    subgraph SAST["3. Code Quality &amp; SAST"]
-        G --> H[Stage 5: SonarQube Scanner Analysis]
-        H --> I[Stage 6: SonarQube Quality Gate]
-        I -.->|Webhook Notification| J[Jenkins /sonarqube-webhook/]
+    subgraph SAST["3. Code Quality & SAST"]
+        G --> H["Stage 5: SonarQube Scanner Analysis"]
+        H --> I["Stage 6: SonarQube Quality Gate"]
+        I -.->|"Webhook Notification"| J["Jenkins /sonarqube-webhook/"]
     end
 
     subgraph SCA["4. Software Composition Analysis (SCA)"]
-        I --> K[Stage 7: Dependency Scan (pip-audit)]
-        K --> L[Archive pip-audit-report.json]
+        I --> K["Stage 7: Dependency Scan (pip-audit)"]
+        K --> L["Archive pip-audit-report.json"]
     end
 
-    subgraph Containerization["5. Container Security &amp; Packaging"]
-        L --> M[Stage 8: Docker Multi-Stage Build]
-        M --> N[Stage 9: Trivy Container Image Scan]
-        N --> O[Stage 10: Docker Image Inspection &amp; Verification]
+    subgraph Containerization["5. Container Security & Packaging"]
+        L --> M["Stage 8: Docker Multi-Stage Build"]
+        M --> N["Stage 9: Trivy Container Image Scan"]
+        N --> O["Stage 10: Docker Image Inspection & Verification"]
     end
 
     classDef pass fill:#22c55e,stroke:#15803d,color:#ffffff;
@@ -60,13 +60,15 @@ flowchart TD
 - **Backend Framework:** Python 3.12, Flask 3.1.3
 - **Templating:** Jinja2
 - **Database:** SQLite3 (parameterized queries, isolated in-memory/temp DBs for testing, mounted file storage for containers)
-- **Frontend / Styling:** Vanilla CSS3 (responsive flexbox and CSS grid, high contrast accessibility, **Zero JavaScript**)
+- **Frontend / Styling:** Modern Dark Glassmorphic Theme with pure CSS3 (responsive flexbox, CSS grid, glowing radial meshes, dynamic CPU load progress bars, card hover lifts, **Zero JavaScript**)
+- **Typography:** Google Fonts ([Plus Jakarta Sans](https://fonts.google.com/specimen/Plus+Jakarta+Sans) for UI & [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono) for code, metrics, and AWS regions)
+- **Branding:** Handcrafted Cyber-Shield DevSecOps vector emblem with dual-gradient styling
 - **CI/CD Automation:** Jenkins (Windows pipeline agent with `bat` steps)
 - **Security & Quality Tooling:**
   - **Secret Detection:** Gitleaks 8.30+
-  - **Unit Testing:** Pytest 9.1+ with JUnit XML reporting
-  - **SAST & Quality Gate:** SonarQube Community Edition &amp; SonarScanner CLI
-  - **SCA (Dependency Vulnerability Scanning):** `pip-audit` (PyPA &amp; OSV database)
+  - **Unit Testing & Coverage:** Pytest 9.1+ with `pytest-cov` (12 tests, 95% line coverage, JUnit XML & Cobertura XML reporting)
+  - **SAST & Quality Gate:** SonarQube Community Edition (Dockerized) & SonarScanner CLI
+  - **SCA (Dependency Vulnerability Scanning):** `pip-audit` (PyPA & OSV database)
   - **Container Vulnerability Scanning:** Aqua Security Trivy (Dockerized)
 - **Containerization:** Docker multi-stage build running as a non-privileged `appuser` (UID unprivileged).
 
@@ -78,20 +80,23 @@ The application provides four primary views, with comprehensive empty-state hand
 
 1. **Dashboard (`/`):**
    - Summary statistics cards: Total Servers, Running Servers, Stopped Servers, Total Deployments, and Pipeline Security status.
+   - Interactive hover elevation and accent color bars.
    - Recent deployment activity history.
    - Live security check summary indicators.
 2. **Servers (`/servers`):**
-   - Cloud inventory displaying server names, real-time statuses (Running / Stopped), simulated CPU load, and AWS deployment region codes.
+   - Cloud inventory displaying server names, real-time statuses (Running / Stopped) with pulsing radar dot indicators.
+   - Dynamic animated CPU usage progress bars with cyan-to-indigo gradient fills.
+   - AWS deployment region codes formatted in monospace chips (`ap-south-1`).
    - Includes graceful empty-state handling if database tables contain 0 rows.
 3. **Deployments (`/deployments`):**
    - Deployment records dynamically queried from SQLite (`version`, `environment`, `status`).
-   - Clean status badges (`SUCCESS` / `FAILED`).
+   - Clean status badges (`SUCCESS` / `FAILED`) with glowing indicator dots.
 4. **Security (`/security`):**
    - DevSecOps checklist tracking automated scanning tools (Gitleaks, pytest, SonarQube, pip-audit, Trivy).
    - Clear distinction between demo checklist entries and live CI/CD pipeline execution logs.
 5. **Production Hardening & Error Handling:**
    - Custom `404 Not Found` and `500 Internal Server Error` templates preventing stack trace leaks.
-   - HTTP security headers (`X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `X-XSS-Protection`).
+   - HTTP security headers (`X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `X-XSS-Protection: 1; mode=block`).
    - Explicit `GET` method routing.
 
 ---
@@ -189,10 +194,10 @@ The pipeline is orchestrated via [Jenkinsfile](file:///Jenkinsfile) across 10 st
 |:---:|:---|:---|:---|
 | **1** | **Checkout** | Git | Clones the repository revision from GitHub. |
 | **2** | **Gitleaks Secret Scan** | Gitleaks | Detects committed credentials, API keys, tokens, and private keys. Fails build if leaks are detected (`--exit-code 1`). |
-| **3** | **Install Dependencies** | Pip | Installs production requirements, pytest, and pip-audit in CI agent. |
-| **4** | **Python Tests** | Pytest | Executes 11 unit tests; publishes `test-results.xml` via Jenkins JUnit plugin. |
-| **5** | **SonarQube Analysis** | SonarScanner | Static Application Security Testing (SAST) analyzing code quality, maintainability, and security hotspots. |
-| **6** | **SonarQube Quality Gate** | SonarQube Webhook | Evaluates quality gate; blocks build until SonarQube returns `OK` via webhook callback. |
+| **3** | **Install Dependencies** | Pip | Installs production requirements, pytest, pytest-cov, and pip-audit in CI agent. |
+| **4** | **Python Tests** | Pytest & pytest-cov | Executes 12 unit tests; generates `coverage.xml` (95% line coverage) and `test-results.xml` (JUnit report). |
+| **5** | **SonarQube Analysis** | SonarScanner | Static Application Security Testing (SAST) analyzing code quality, maintainability, security hotspots, and code coverage. |
+| **6** | **SonarQube Quality Gate** | SonarQube Webhook | Evaluates quality gate (Coverage on New Code &ge; 80%, 0 bugs, 0 vulnerabilities); releases pipeline when SonarQube returns `OK`. |
 | **7** | **Dependency Vulnerability Scan** | pip-audit | Software Composition Analysis (SCA) querying OSV &amp; PyPA databases for known CVEs. Generates `pip-audit-report.json`. |
 | **8** | **Docker Image Build** | Docker Engine | Builds multi-stage production image tagged `cloudops-manager:ci`. |
 | **9** | **Trivy Image Scan** | Aqua Trivy | Scans container OS and library layers for vulnerabilities. Blocks build on critical application library CVEs. |
@@ -230,6 +235,7 @@ Gitleaks detects hardcoded secrets across the entire Git history:
      - **Name:** `Jenkins-Webhook`
      - **URL:** `http://host.docker.internal:8080/sonarqube-webhook/`
    - *Why `host.docker.internal`?* Because SonarQube runs inside a Docker Desktop container and needs to reach Jenkins running on the Windows host on port 8080.
+   - *SSRF Setting:* In SonarQube &gt; *Administration* &gt; *Configuration* &gt; *Security*, turn off **Enable local webhooks validation** so SonarQube allows webhooks to private/container bridge addresses.
 
 ### pip-audit (Software Composition Analysis)
 - `pip-audit` is the official PyPA-recommended auditing tool.
@@ -251,6 +257,8 @@ Gitleaks detects hardcoded secrets across the entire Git history:
 
 | Issue / Error Message | Root Cause | Solution |
 |:---|:---|:---|
+| `Invalid URL: loopback, wildcard... not allowed for webhooks` | SonarQube Server-Side Request Forgery (SSRF) validation blocks private/internal webhook targets by default. | In SonarQube &gt; *Administration* &gt; *Configuration* &gt; *Security*, toggle **Enable local webhooks validation** to **OFF** and save. |
+| `Pipeline aborted due to quality gate failure: ERROR` (Coverage on new code &lt; 80%) | SonarQube's default Quality Gate enforces &ge; 80% coverage on new code, but no coverage XML was provided. | Configured `pytest-cov` to generate `coverage.xml` (`sonar.python.coverage.reportPaths=coverage.xml`), expanding test suite to 12 tests achieving 95% line coverage. |
 | `Call to URL [http://localhost:9000/api/v2/analysis/version] failed: null` | SonarQube container was stopped or Docker Desktop engine was not running. | Start Docker Desktop, then execute `docker start sonarqube`. Wait for `http://localhost:9000/api/system/status` to report `status: UP`. |
 | `Both 'sonar.login' and 'sonar.token' are set` | Passing `-Dsonar.token` manually while `withSonarQubeEnv` is already setting token environment variables. | Use `withSonarQubeEnv('SonarQube')` and let the scanner automatically read `SONAR_TOKEN`. |
 | `failed to connect to docker API at npipe:////./pipe/dockerDesktopLinuxEngine` | Docker Desktop was closed or WSL2 backend was restarting. | Launch Docker Desktop (`Docker Desktop.exe`) and confirm `docker ps` returns successfully. |
