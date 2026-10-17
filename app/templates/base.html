@@ -25,13 +25,31 @@
 
             <div class="logo">
                 <div class="logo-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logoGrad1" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#38bdf8"/>
+                                <stop offset="50%" stop-color="#6366f1"/>
+                                <stop offset="100%" stop-color="#a855f7"/>
+                            </linearGradient>
+                            <linearGradient id="logoGrad2" x1="8" y1="10" x2="24" y2="22" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#ffffff"/>
+                                <stop offset="100%" stop-color="#7dd3fc"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Cyber Hexagonal Shield Frame -->
+                        <path d="M16 2.5L27 8.8V19.2L16 29.5L5 19.2V8.8L16 2.5Z" stroke="url(#logoGrad1)" stroke-width="2" stroke-linejoin="round" fill="rgba(14, 165, 233, 0.08)"/>
+                        <!-- Central Continuous Loop & Node -->
+                        <path d="M10 16C10 13.5 12 13.5 14 16L18 16C20 18.5 22 18.5 22 16C22 13.5 20 13.5 18 16L14 16C12 18.5 10 18.5 10 16Z" stroke="url(#logoGrad2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <!-- Tech Nodes -->
+                        <circle cx="16" cy="8" r="1.75" fill="#38bdf8"/>
+                        <circle cx="23" cy="20" r="1.5" fill="#818cf8"/>
+                        <circle cx="9" cy="20" r="1.5" fill="#34d399"/>
                     </svg>
                 </div>
                 <div class="logo-text">
-                    <h2>CloudOps</h2>
-                    <span>DevSecOps Platform</span>
+                    <h2><span class="brand-cloud">Cloud</span><span class="brand-ops">Ops</span></h2>
+                    <span class="logo-tag">DevSecOps Platform</span>
                 </div>
             </div>
 
