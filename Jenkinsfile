@@ -36,15 +36,16 @@ pipeline {
                     python --version
                     python -m pip install --upgrade pip
                     python -m pip install -r requirements.txt
-                    python -m pip install pytest pip-audit
+                    python -m pip install pytest pytest-cov pip-audit
                 '''
             }
         }
 
         stage('Python Tests') {
             steps {
-                bat 'python -m pytest -v --junitxml=test-results.xml'
+                bat 'python -m pytest --cov=app --cov-report=term --cov-report=xml:coverage.xml --junitxml=test-results.xml -p no:platformdirs'
             }
+
 
             post {
                 always {
@@ -53,6 +54,7 @@ pipeline {
                 }
             }
         }
+
 
         stage('SonarQube Analysis') {
             steps {

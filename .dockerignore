@@ -22,6 +22,7 @@ __pycache__/
 
 # Test, report, and coverage artifacts
 .coverage
+coverage.xml
 htmlcov/
 test-results.xml
 *.xml

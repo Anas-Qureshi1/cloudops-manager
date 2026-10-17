@@ -18,6 +18,10 @@ venv/
 .vscode/
 .idea/
 
-# Coverage
+# Coverage and test artifacts
 .coverage
+coverage.xml
 htmlcov/
+test-results.xml
+pip-audit-report.json
+trivy-report.json

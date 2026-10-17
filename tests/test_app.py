@@ -124,3 +124,32 @@ def test_security_headers_present(client):
     assert response.headers.get("X-Content-Type-Options") == "nosniff"
     assert response.headers.get("X-Frame-Options") == "SAMEORIGIN"
 
+
+def test_seed_database(monkeypatch):
+    from app.seed import seed_database
+
+    database_fd, database_path = tempfile.mkstemp()
+    os.close(database_fd)
+
+    monkeypatch.setenv("DATABASE_PATH", database_path)
+    try:
+        seed_database()
+        connection = get_db_connection(database_path)
+        server_count = connection.execute("SELECT COUNT(*) FROM servers").fetchone()[0]
+        deployment_count = connection.execute("SELECT COUNT(*) FROM deployments").fetchone()[0]
+        security_count = connection.execute("SELECT COUNT(*) FROM security_checks").fetchone()[0]
+        connection.close()
+
+        assert server_count > 0
+        assert deployment_count > 0
+        assert security_count > 0
+
+        # Running again should not insert duplicates
+        seed_database()
+        connection = get_db_connection(database_path)
+        assert connection.execute("SELECT COUNT(*) FROM servers").fetchone()[0] == server_count
+        connection.close()
+    finally:
+        os.unlink(database_path)
+
+
