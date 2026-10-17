@@ -4,9 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="CloudOps Manager - DevSecOps Cloud Resource & Security Dashboard Demo">
+    <meta name="description" content="CloudOps Manager - Modern DevSecOps Cloud Resource & Security Dashboard">
 
     <title>{% block title %}CloudOps Manager{% endblock %}</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -15,65 +20,123 @@
 
     <div class="layout">
 
+        <!-- Modern Dark Glassmorphic Sidebar -->
         <aside class="sidebar" aria-label="Sidebar Navigation">
 
             <div class="logo">
-                <h2>CloudOps</h2>
-                <span>Manager</span>
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h2>CloudOps</h2>
+                    <span>DevSecOps Platform</span>
+                </div>
             </div>
 
             <nav aria-label="Main Navigation">
 
-                <a href="{{ url_for('dashboard') }}" class="nav-link">
-                    Dashboard
+                <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="7" height="9" x="3" y="3" rx="1"/>
+                        <rect width="7" height="5" x="14" y="3" rx="1"/>
+                        <rect width="7" height="9" x="14" y="12" rx="1"/>
+                        <rect width="7" height="5" x="3" y="16" rx="1"/>
+                    </svg>
+                    <span>Dashboard</span>
                 </a>
 
-                <a href="{{ url_for('servers') }}" class="nav-link">
-                    Servers
+                <a href="{{ url_for('servers') }}" class="nav-link {% if request.path == '/servers' %}active{% endif %}">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="20" height="8" x="2" y="2" rx="2" ry="2"/>
+                        <rect width="20" height="8" x="2" y="14" rx="2" ry="2"/>
+                        <line x1="6" x2="6.01" y1="6" y2="6"/>
+                        <line x1="6" x2="6.01" y1="18" y2="18"/>
+                    </svg>
+                    <span>Servers</span>
                 </a>
 
-                <a href="{{ url_for('deployments') }}" class="nav-link">
-                    Deployments
+                <a href="{{ url_for('deployments') }}" class="nav-link {% if request.path == '/deployments' %}active{% endif %}">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                    </svg>
+                    <span>Deployments</span>
                 </a>
 
-                <a href="{{ url_for('security') }}" class="nav-link">
-                    Security
+                <a href="{{ url_for('security') }}" class="nav-link {% if request.path == '/security' %}active{% endif %}">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+                        <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                    <span>Security</span>
                 </a>
 
             </nav>
 
             <div class="sidebar-footer">
-                <p>DevSecOps Platform</p>
-                <small>Demo Environment</small>
+                <div class="pipeline-status-indicator">
+                    <span class="pulsing-orb"></span>
+                    <div class="pipeline-status-text">
+                        <strong>CI/CD Gate: PASSED</strong>
+                        <small>Jenkins &bull; SonarQube &bull; Trivy</small>
+                    </div>
+                </div>
             </div>
 
         </aside>
 
 
+        <!-- Main Application Area -->
         <main class="main-content">
 
+            <!-- Sleek Glassmorphic Topbar -->
             <header class="topbar">
 
-                <div>
-                    <h1>{% block page_title %}{% endblock %}</h1>
+                <div class="topbar-title-group">
+                    <div class="breadcrumb">
+                        <span>CloudOps</span>
+                        <span class="separator">/</span>
+                        <span class="current">{% block page_title %}{% endblock %}</span>
+                    </div>
+                    <h1>{% block page_heading %}{{ self.page_title() }}{% endblock %}</h1>
                     <p class="subtitle">
-                        Cloud infrastructure management &amp; DevSecOps dashboard
+                        Automated Cloud Infrastructure &amp; Continuous Security Dashboard
                     </p>
                 </div>
 
-                <div class="user-badge-container">
+                <div class="topbar-actions">
+                    <div class="badge-live-pulse">
+                        <span class="dot-online"></span>
+                        <span>DevSecOps Active</span>
+                    </div>
                     <span class="badge badge-demo">Simulated Demo Data</span>
-                    <div class="user">
-                        <span>Admin</span>
+                    <div class="user-pill">
+                        <div class="avatar-glow">AQ</div>
+                        <div class="user-info">
+                            <span class="user-name">Anas Qureshi</span>
+                            <span class="user-role">SecOps Lead</span>
+                        </div>
                     </div>
                 </div>
 
             </header>
 
+            <!-- Modern Announcement Banner -->
             <div class="demo-banner" role="status">
-                <strong>Demo Mode:</strong> Displaying simulated cloud resources and pipeline verification records from local SQLite storage. Real infrastructure API integration and cloud deployment steps are documented as future roadmap items.
+                <div class="demo-banner-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="16" x2="12" y2="12"/>
+                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                    </svg>
+                </div>
+                <div class="demo-banner-content">
+                    <strong>Portfolio Environment:</strong> Serving simulated cloud resource inventory and security gates via SQLite backend. Validated across 10 CI/CD automated stages in Jenkins.
+                </div>
             </div>
 
+            <!-- Page Content Injection -->
             <section class="content">
 
                 {% block content %}

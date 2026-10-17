@@ -75,7 +75,12 @@ Servers
                 </td>
 
                 <td>
-                    {{ server["cpu"] }}%
+                    <div class="cpu-cell">
+                        <div class="cpu-meter-track">
+                            <div class="cpu-meter-fill" style="width: {{ server['cpu'] }}%;"></div>
+                        </div>
+                        <span>{{ server["cpu"] }}%</span>
+                    </div>
                 </td>
 
                 <td>
