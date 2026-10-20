@@ -1,6 +1,8 @@
 # CloudOps Manager — Secure DevSecOps CI/CD Pipeline
 
 [![CI Pipeline](https://img.shields.io/badge/Jenkins-CI%2FCD-blue?logo=jenkins)](http://localhost:8080)
+[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-Active-blue?logo=github-actions)](https://github.com/Anas-Qureshi1/cloudops-manager/actions)
+[![Vercel](https://img.shields.io/badge/Vercel-Ready-black?logo=vercel)](https://vercel.com)
 [![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.1.3-black?logo=flask)](https://flask.palletsprojects.com/)
 [![Docker](https://img.shields.io/badge/Docker-Multi--Stage-blue?logo=docker)](https://www.docker.com/)
@@ -274,10 +276,11 @@ Gitleaks detects hardcoded secrets across the entire Git history:
 
 ---
 
-## 11. Future Roadmap
+## 11. Future Roadmap & Cloud Deployment
 
+- [x] Vercel Serverless deployment support (`api/index.py`, `vercel.json`, and dynamic `/tmp` auto-seeding).
+- [x] GitHub Actions parallel cloud CI workflow for unit tests, security scans, and container build verification.
 - [ ] Dynamic Application Security Testing (DAST) using OWASP ZAP against running container.
 - [ ] Terraform infrastructure-as-code manifests for automated AWS VPC &amp; ECS Fargate provisioning.
 - [ ] AWS ECR image push with AWS IAM least-privilege role assumption.
 - [ ] Production WSGI server (Gunicorn / Waitress) configuration behind Nginx reverse proxy.
-- [ ] GitHub Actions parallel workflow mirroring Jenkins pipeline for hybrid CI/CD comparison.

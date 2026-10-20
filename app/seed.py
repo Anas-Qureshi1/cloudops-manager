@@ -3,8 +3,8 @@ import os
 from app.database import get_db_connection, init_db
 
 
-def seed_database():
-    database = os.environ.get("DATABASE_PATH", "cloudops.db")
+def seed_database(database=None):
+    database = database or os.environ.get("DATABASE_PATH", "cloudops.db")
     init_db(database)
     connection = get_db_connection(database)
 

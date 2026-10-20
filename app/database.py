@@ -5,7 +5,7 @@ DATABASE = os.environ.get("DATABASE_PATH", "cloudops.db")
 
 
 def get_db_connection(database=None):
-    database = database or DATABASE
+    database = database or os.environ.get("DATABASE_PATH", DATABASE)
     connection = sqlite3.connect(database)
     connection.row_factory = sqlite3.Row
     return connection

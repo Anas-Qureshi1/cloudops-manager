@@ -24,4 +24,8 @@ coverage.xml
 htmlcov/
 test-results.xml
 pip-audit-report.json
-trivy-report.json
+trivy-report.json
+
+# Vercel
+.vercel
+

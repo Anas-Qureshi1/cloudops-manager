@@ -153,3 +153,22 @@ def test_seed_database(monkeypatch):
         os.unlink(database_path)
 
 
+def test_vercel_entrypoint(monkeypatch):
+    database_fd, database_path = tempfile.mkstemp()
+    os.close(database_fd)
+
+    monkeypatch.setenv("VERCEL", "1")
+    monkeypatch.setenv("DATABASE_PATH", database_path)
+
+    import api.index as vercel_entry
+    client = vercel_entry.app.test_client()
+    response = client.get("/")
+    assert response.status_code == 200
+
+    try:
+        os.unlink(database_path)
+    except OSError:
+        pass
+
+
+
