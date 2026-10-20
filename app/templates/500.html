@@ -15,7 +15,10 @@ Internal Server Error | CloudOps Manager
     <div class="empty-state">
         <h2>500</h2>
         <p>An unexpected internal error occurred. Please contact the administrator.</p>
-        <p>
+        {% if error_details %}
+        <pre style="text-align: left; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 1rem; border-radius: 8px; overflow-x: auto; font-family: monospace; font-size: 0.85rem; margin-top: 1rem;">{{ error_details }}</pre>
+        {% endif %}
+        <p style="margin-top: 1.5rem;">
             <a href="{{ url_for('dashboard') }}" class="btn">Return to Dashboard</a>
         </p>
     </div>

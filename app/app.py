@@ -1,15 +1,23 @@
 import os
+import sqlite3
+import traceback
 from flask import Flask, render_template
-from app.database import get_db_connection
+from app.database import get_db_connection, get_default_db_path
 
 app = Flask(__name__)
 
 
 def get_database():
-    database = app.config.get("DATABASE")
-    if database:
-        return get_db_connection(database)
-    return get_db_connection()
+    database = app.config.get("DATABASE") or get_default_db_path()
+    connection = get_db_connection(database)
+    try:
+        connection.execute("SELECT 1 FROM servers LIMIT 1")
+    except sqlite3.OperationalError:
+        from app.seed import seed_database
+        connection.close()
+        seed_database(database)
+        connection = get_db_connection(database)
+    return connection
 
 
 @app.after_request
@@ -27,7 +35,9 @@ def handle_not_found(error):
 
 @app.errorhandler(500)
 def handle_internal_error(error):
-    return render_template("500.html"), 500
+    error_tb = traceback.format_exc()
+    print("500 Internal Error:\n", error_tb)
+    return render_template("500.html", error_details=error_tb), 500
 
 
 @app.route("/", methods=["GET"])
