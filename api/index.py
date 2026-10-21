@@ -27,40 +27,63 @@ except Exception as err:
 class VercelPathMiddleware:
     """
     WSGI middleware to correctly resolve client request paths on Vercel.
-    Supports edge proxy headers, query parameter rewrites (?path=$1),
-    and direct function invocations.
+    Supports Vercel rewrites (?path=$1), edge proxy headers, and direct function invocations.
     """
     def __init__(self, wsgi_app):
         self.wsgi_app = wsgi_app
 
     def __call__(self, environ, start_response):
-        # 1. Edge proxy headers
-        forwarded_uri = (
-            environ.get("HTTP_X_FORWARDED_URI")
-            or environ.get("HTTP_X_MATCHED_PATH")
-            or environ.get("HTTP_X_ORIGINAL_URI")
-        )
+        query_string = environ.get("QUERY_STRING", "")
+        resolved_path = None
 
-        if forwarded_uri:
-            parts = forwarded_uri.split("?", 1)
-            environ["PATH_INFO"] = parts[0]
-            if len(parts) > 1 and not environ.get("QUERY_STRING"):
-                environ["QUERY_STRING"] = parts[1]
+        # 1. Check query string for path injected by vercel.json rewrite (?path=$1)
+        if query_string:
+            parsed_params = urllib.parse.parse_qs(query_string, keep_blank_values=True)
+            if "path" in parsed_params:
+                raw_path = parsed_params.pop("path")[0].strip()
+                # Clean 'path' parameter out of QUERY_STRING so request.args is clean
+                clean_pairs = []
+                for key, values in parsed_params.items():
+                    for val in values:
+                        clean_pairs.append((key, val))
+                environ["QUERY_STRING"] = urllib.parse.urlencode(clean_pairs)
+
+                clean_path = raw_path.strip("/")
+                if clean_path and clean_path not in ("api/index.py", "api/index", "api"):
+                    resolved_path = "/" + clean_path
+                else:
+                    resolved_path = "/"
+
+        # 2. Check edge proxy headers if not resolved via query string
+        if not resolved_path:
+            forwarded_uri = (
+                environ.get("HTTP_X_FORWARDED_URI")
+                or environ.get("HTTP_X_ORIGINAL_URI")
+            )
+            if forwarded_uri and not forwarded_uri.startswith(("/api/index.py", "/api/index")):
+                parts = forwarded_uri.split("?", 1)
+                clean_path = parts[0].strip("/")
+                if clean_path and clean_path not in ("api/index.py", "api/index", "api"):
+                    resolved_path = "/" + clean_path
+                else:
+                    resolved_path = "/"
+                if len(parts) > 1 and not environ.get("QUERY_STRING"):
+                    environ["QUERY_STRING"] = parts[1]
+
+        # 3. Apply resolved path or normalize existing PATH_INFO
+        if resolved_path:
+            environ["PATH_INFO"] = resolved_path
         else:
-            # 2. Check query string for path injected by vercel.json rewrite
-            qs = environ.get("QUERY_STRING", "")
-            params = urllib.parse.parse_qs(qs)
-            if "path" in params and params["path"][0]:
-                raw_target = params["path"][0]
-                environ["PATH_INFO"] = "/" + raw_target.lstrip("/")
-            else:
-                path_info = environ.get("PATH_INFO", "")
-                if path_info in ("/api/index.py", "/api/index", "/api", ""):
-                    environ["PATH_INFO"] = "/"
-                elif path_info.startswith("/api/index.py/"):
-                    environ["PATH_INFO"] = path_info[len("/api/index.py"):]
-                elif path_info.startswith("/api/index/"):
-                    environ["PATH_INFO"] = path_info[len("/api/index"):]
+            path_info = environ.get("PATH_INFO", "")
+            if path_info in ("/api/index.py", "/api/index", "/api", ""):
+                environ["PATH_INFO"] = "/"
+            elif path_info.startswith("/api/index.py/"):
+                environ["PATH_INFO"] = "/" + path_info[len("/api/index.py/"):].lstrip("/")
+            elif path_info.startswith("/api/index/"):
+                environ["PATH_INFO"] = "/" + path_info[len("/api/index/"):].lstrip("/")
+
+        # 4. Clear SCRIPT_NAME to prevent url_for() from prepending /api/index
+        environ["SCRIPT_NAME"] = ""
 
         return self.wsgi_app(environ, start_response)
 

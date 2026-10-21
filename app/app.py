@@ -41,8 +41,6 @@ def handle_internal_error(error):
 
 
 @app.route("/", methods=["GET"])
-@app.route("/api/index.py", methods=["GET"])
-@app.route("/api/index", methods=["GET"])
 def dashboard():
     connection = get_database()
     try:

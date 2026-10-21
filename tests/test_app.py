@@ -161,14 +161,60 @@ def test_vercel_entrypoint(monkeypatch):
     monkeypatch.setenv("DATABASE_PATH", database_path)
 
     import api.index as vercel_entry
-    client = vercel_entry.app.test_client()
-    response = client.get("/")
-    assert response.status_code == 200
+    from werkzeug.test import Client
+    from werkzeug.wrappers import Response
+
+    client = Client(vercel_entry.app.wsgi_app, Response)
 
     try:
-        os.unlink(database_path)
-    except OSError:
-        pass
+        # 1. Direct requests
+        response = client.get("/")
+        assert response.status_code == 200
+        assert "Cloud Infrastructure Overview" in response.text
+        assert 'href="/" class="nav-link active"' in response.text
+        assert 'href="/api/index"' not in response.text
+
+        # 2. Vercel rewrite with path=servers
+        servers_res = client.get("/api/index.py?path=servers")
+        assert servers_res.status_code == 200
+        assert "Cloud Server Inventory" in servers_res.text
+        assert 'href="/servers" class="nav-link active"' in servers_res.text
+        assert 'href="/" class="nav-link' in servers_res.text
+        assert 'href="/api/index"' not in servers_res.text
+
+        # 3. Vercel rewrite with path=deployments
+        dep_res = client.get("/api/index.py?path=deployments")
+        assert dep_res.status_code == 200
+        assert "Deployment History" in dep_res.text
+        assert 'href="/deployments" class="nav-link active"' in dep_res.text
+        assert 'href="/api/index"' not in dep_res.text
+
+        # 4. Vercel rewrite with path=security
+        sec_res = client.get("/api/index.py?path=security")
+        assert sec_res.status_code == 200
+        assert "DevSecOps Security Checks" in sec_res.text
+        assert 'href="/security" class="nav-link active"' in sec_res.text
+        assert 'href="/api/index"' not in sec_res.text
+
+        # 5. Vercel direct rewrite for root dashboard
+        dash_res = client.get("/api/index.py?path=")
+        assert dash_res.status_code == 200
+        assert "Cloud Infrastructure Overview" in dash_res.text
+        assert 'href="/" class="nav-link active"' in dash_res.text
+        assert 'href="/api/index"' not in dash_res.text
+
+        # 6. Legacy /api/index path normalization
+        api_index_res = client.get("/api/index.py?path=api/index")
+        assert api_index_res.status_code == 200
+        assert "Cloud Infrastructure Overview" in api_index_res.text
+        assert 'href="/" class="nav-link active"' in api_index_res.text
+        assert 'href="/api/index"' not in api_index_res.text
+    finally:
+        try:
+            os.unlink(database_path)
+        except OSError:
+            pass
+
 
 
 
