@@ -14,8 +14,7 @@ Page Not Found | CloudOps Manager
 
     <div class="empty-state">
         <h2>404</h2>
-        <p>The requested page <code>{{ request.path }}</code> could not be found.</p>
-        <p><small>DEBUG: PATH_INFO={{ request.environ.get('PATH_INFO') }} | QUERY={{ request.environ.get('QUERY_STRING') }} | MATCHED={{ request.environ.get('HTTP_X_MATCHED_PATH') }} | FORWARDED={{ request.environ.get('HTTP_X_FORWARDED_URI') }}</small></p>
+        <p>The requested page could not be found.</p>
         <p>
             <a href="{{ url_for('dashboard') }}" class="btn">Return to Dashboard</a>
         </p>
