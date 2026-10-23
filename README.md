@@ -20,39 +20,39 @@ The project implements a "Shift-Left" security model where code is automatically
 
 ```mermaid
 flowchart TD
-    subgraph SCM["1. Source Control"]
-        A["Git Commit & Push"] --> B["Jenkins SCM Trigger"]
+    subgraph SCM ["1. Source Control"]
+        A["Git Commit and Push"] --> B["Jenkins SCM Trigger"]
     end
 
-    subgraph ShiftLeft["2. Shift-Left Security & Testing"]
+    subgraph ShiftLeft ["2. Shift-Left Security and Testing"]
         B --> C["Stage 1: Checkout"]
         C --> D["Stage 2: Gitleaks Secret Scan"]
         D --> E["Stage 3: Install Dependencies"]
         E --> F["Stage 4: Python Unit Tests (pytest)"]
-        F --> G["Generate JUnit XML & Coverage Reports"]
+        F --> G["Generate JUnit XML and Coverage Reports"]
     end
 
-    subgraph SAST["3. Code Quality & SAST"]
+    subgraph SAST ["3. Code Quality and SAST"]
         G --> H["Stage 5: SonarQube Scanner Analysis"]
         H --> I["Stage 6: SonarQube Quality Gate"]
-        I -.->|"Webhook Notification"| J["Jenkins /sonarqube-webhook/"]
+        I -.->|Webhook Notification| J["Jenkins sonarqube-webhook"]
     end
 
-    subgraph SCA["4. Software Composition Analysis (SCA)"]
+    subgraph SCA ["4. Software Composition Analysis (SCA)"]
         I --> K["Stage 7: Dependency Scan (pip-audit)"]
         K --> L["Archive pip-audit-report.json"]
     end
 
-    subgraph Containerization["5. Container Security & Packaging"]
+    subgraph Containerization ["5. Container Security and Packaging"]
         L --> M["Stage 8: Docker Multi-Stage Build"]
         M --> N["Stage 9: Trivy Container Image Scan"]
-        N --> O["Stage 10: Docker Image Inspection & Verification"]
+        N --> O["Stage 10: Docker Image Inspection and Verification"]
     end
 
-    classDef pass fill:#22c55e,stroke:#15803d,color:#ffffff;
-    classDef step fill:#1e293b,stroke:#3b82f6,color:#ffffff;
-    class A,B,C,D,E,F,H,I,K,M,N,O step;
-    class G,J,L pass;
+    classDef pass fill:#22c55e,stroke:#15803d,color:#ffffff
+    classDef step fill:#1e293b,stroke:#3b82f6,color:#ffffff
+    class A,B,C,D,E,F,H,I,K,M,N,O step
+    class G,J,L pass
 ```
 
 ---

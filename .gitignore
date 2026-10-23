@@ -28,4 +28,8 @@ trivy-report.json
 
 # Vercel
 .vercel
+
+# SonarQube
+.scannerwork/
+
 
